@@ -48,6 +48,11 @@ namespace SuperDict
         public static void Remove(string word,
                                    string language)
         {
+            if (word == null)
+                throw new ArgumentNullException(nameof(word));
+            if (language == null)
+                throw new ArgumentNullException(nameof(language));
+
             Translation toRemove = Translations.SingleOrDefault(x => x.FromLanguage == language && x.FromWord == word || x.ToLanguage == language && x.ToWord == word);
             if (toRemove == null)
                 throw new Exception("Nothing to delete.");
@@ -63,8 +68,16 @@ namespace SuperDict
                                         string fromLanguage,
                                         string toLanguage)
         {
-            string result = Translations.SingleOrDefault(x => x.FromLanguage == fromLanguage && x.FromWord == fromWord && x.ToLanguage == toLanguage)?.ToWord ?? Translations.SingleOrDefault(x => x.ToLanguage == fromLanguage && x.ToWord == fromWord && x.FromLanguage == toLanguage)?.FromWord;
+            if (fromWord == null)
+                throw new ArgumentNullException(nameof(fromWord));
+            if (fromLanguage == null)
+                throw new ArgumentNullException(nameof(fromLanguage));
+            if (toLanguage == null)
+                throw new ArgumentNullException(nameof(toLanguage));
 
+            string result = Translations.SingleOrDefault(x => x.FromLanguage == fromLanguage && x.FromWord == fromWord && x.ToLanguage == toLanguage)?.ToWord ?? Translations.SingleOrDefault(x => x.ToLanguage == fromLanguage && x.ToWord == fromWord && x.FromLanguage == toLanguage)?.FromWord;
+            if (result == null)
+                throw new Exception("Not found");
             return result;
         }
     }

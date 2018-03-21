@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SuperDict;
@@ -9,8 +8,6 @@ namespace TestProject
     [TestClass]
     public class UnitTest1
     {
-        private Program _p;
-
         public UnitTest1()
         {
             TranslationHandler.Clear();
@@ -29,6 +26,14 @@ namespace TestProject
         #endregion
 
         #region Remove
+        [DataRow("Hello", "EN")]
+        [TestMethod]
+        public void Remove_HasNullParameters(string fromWord, string fromLanguage)
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => TranslationHandler.Remove(null, fromLanguage));
+            Assert.ThrowsException<ArgumentNullException>(() => TranslationHandler.Remove(fromWord, null));
+        }
+
         [DataRow("Hello", "EN", "Привет", "RU")]
         [TestMethod]
         public void RemoveRecord_RemovesRecord(string fromWord,
@@ -60,6 +65,37 @@ namespace TestProject
 
         #endregion
 
+        #region Translate
+        [DataRow("Hello", "EN","RU")]
+        [TestMethod]
+        public void Translate_HasNullParameters(string fromWord, string fromLanguage, string toLanguage)
+        {
+            Assert.ThrowsException<ArgumentNullException>(() => TranslationHandler.Translate(null, fromLanguage, toLanguage));
+            Assert.ThrowsException<ArgumentNullException>(() => TranslationHandler.Translate(fromWord, null, toLanguage));
+            Assert.ThrowsException<ArgumentNullException>(() => TranslationHandler.Translate(fromWord, fromLanguage, null));
+        }
+
+
+        [TestMethod]
+        [DataRow("Hello1", "EN", "Привет", "RU")]
+        [DataRow("Hello", "EN1", "Привет", "RU")]
+        [DataRow("Hello", "EN", "Привет", "RU1")]
+        public void Translate_TranllationThwowsExceptionIfNotFound(string fromWord, string fromLanguage, string toWord, string toLanguage)
+        {
+            TranslationHandler.AddEntry("Hello", "EN", "Привет", "RU"); 
+            Assert.ThrowsException<Exception>(()=>TranslationHandler.Translate(fromWord, fromLanguage, toLanguage),$"{fromWord} {fromLanguage} {toLanguage}");        
+        }
+
+        [TestMethod]
+        [DataRow("Hello", "EN", "Привет", "RU")]
+        public void Translate_TranllationReturnsValidValue(string fromWord, string fromLanguage, string toWord, string toLanguage)
+        {
+            TranslationHandler.AddEntry(fromWord, fromLanguage, toWord, toLanguage);
+            Assert.AreEqual(toWord, TranslationHandler.Translate(fromWord, fromLanguage, toLanguage));
+        }
+
+
+        #endregion
 
         #region AddEntry
         [DataRow("Hello", "EN", "Привет", "RU")]
